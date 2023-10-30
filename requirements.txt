@@ -1,0 +1,11 @@
+sqlalchemy
+fastapi
+psycopg2-binary
+passlib[bcrypt]
+uvicorn
+python-jose[cryptography]
+python-multipart
+# Dev
+pytest
+requests
+tenacity
