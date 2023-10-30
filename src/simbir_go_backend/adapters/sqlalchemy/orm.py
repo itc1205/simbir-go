@@ -26,6 +26,7 @@ accounts = Table(
     Column("username", String(255), unique=True),
     Column("isAdmin", Boolean),
     Column("balance", Float),
+    Column("disabledToken", Boolean)
 )
 
 transports = Table(

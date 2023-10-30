@@ -21,6 +21,7 @@ class Account:
     password: str
     isAdmin: bool
     balance: float
+    disabledToken: bool
 
 
 @dataclass

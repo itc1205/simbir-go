@@ -9,6 +9,9 @@ class AbstractAccountRepo(abc.ABC):
     def get(self, id: int) -> Optional[Account]:
         return self._get(id)
 
+    def get_by_username(self, username: str) -> Optional[Account]:
+        return self._get_by_username(username)
+
     def add(self, account: Account):
         return self._add(account)
 
@@ -24,6 +27,10 @@ class AbstractAccountRepo(abc.ABC):
 
     @abc.abstractmethod
     def _get(self, id: int) -> Optional[Account]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _get_by_username(self, username: str) -> Optional[Account]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -101,6 +108,9 @@ class SqlAlchemyAccountRepo(AbstractAccountRepo):
 
     def _get(self, id: int) -> Optional[Account]:
         return self.session.query(Account).filter_by(id=id).one_or_none()
+
+    def _get_by_username(self, username: str) -> Account | None:
+        return self.session.query(Account).filter_by(username=username).one_or_none()
 
     def _add(self, account: Account):
         self.session.add(account)
