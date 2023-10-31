@@ -209,26 +209,17 @@ class SqlAlchemyTransportRepo(AbstractTransportRepo):
         transportType: SearchTransportType,
     ) -> TextClause:
         query = (
-            "SELECT id, "
-            "( "
-            "6371 * "
-            f"acos(cos(radians({latitude})) * "
-            "cos(radians(latitude)) * "
-            "cos(radians(longitude) - "
-            f"radians({longitude})) + "
-            f"sin(radians({latitude})) * "
-            "sin(radians(latitude))) "
-            ") AS \"distance\""
-            'FROM "Transports" '
-            'WHERE "canBeRented"=True '
+            "SELECT t.id, v.distance "
+            "FROM \"Transports\" t CROSS JOIN LATERAL "
+            f"(VALUES ( 6371 * acos( cos( radians(37) ) * cos( radians( t.latitude ) ) * cos( radians( t.longitude ) - radians({longitude}) ) + sin( radians({latitude}) ) * sin( radians( t.latitude ) ) ) "
+            ")) v(distance) "
+            f'WHERE v.distance < {radius} AND t."canBeRented"=True '
         )
 
         if not transportType == SearchTransportType.All:
-            query += f'AND "transportType"=\'{transportType.value}\' '
-        #query += "GROUP BY \"distance\" "
+            query += f"AND \"transportType\"='{transportType.value}' "
 
-        query += f"HAVING \"distance\" < {radius} "
-        query += "ORDER BY \"distance\"; "
+        query += "ORDER BY distance; "
         return text(query)
 
 
