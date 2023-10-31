@@ -22,17 +22,17 @@ metadata = mapper_registry.metadata
 accounts = Table(
     "accounts",
     metadata,
-    Column("id", Integer, autoincrement=True, unique=True),
+    Column("id", Integer, primary_key=True, autoincrement=True, unique=True),
     Column("username", String(255), unique=True),
+    Column("password", String(255)),
     Column("isAdmin", Boolean),
     Column("balance", Float),
-    Column("disabledToken", Boolean)
 )
 
 transports = Table(
     "transports",
     metadata,
-    Column("id", Integer, autoincrement=True, unique=True),
+    Column("id", Integer, primary_key=True, autoincrement=True, unique=True),
     Column("ownerId", ForeignKey("accounts.id")),
     Column("canBeRented", Boolean),
     Column("transportType", OrmTransportType),
@@ -49,7 +49,7 @@ transports = Table(
 rents = Table(
     "rents",
     metadata,
-    Column("id", Integer, autoincrement=True, unique=True),
+    Column("id", Integer, primary_key=True, autoincrement=True, unique=True),
     Column("userId", ForeignKey("accounts.id")),
     Column("transportId", ForeignKey("transports.id")),
     Column("timeStart", DateTime),

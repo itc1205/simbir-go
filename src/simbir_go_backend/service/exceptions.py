@@ -12,3 +12,7 @@ class TransportNotFound(Exception):
 
 class RentNotFound(Exception):
     pass
+
+
+class UnrentableTransport(Exception):
+    pass

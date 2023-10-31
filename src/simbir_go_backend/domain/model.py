@@ -21,7 +21,6 @@ class Account:
     password: str
     isAdmin: bool
     balance: float
-    disabledToken: bool
 
 
 @dataclass
@@ -63,4 +62,15 @@ def rent_transport(
     priceType: PriceType,
     finalPrice: Optional[float],
 ) -> Rent:
+    transport.canBeRented = False
     return Rent(transport, user, timeStart, timeEnd, priceOfUnit, priceType, finalPrice)
+
+
+def calculate_final_price(rent: Rent):
+
+    time_passed = rent.timeEnd - rent.timeStart
+
+    if rent.priceType is PriceType.Days:
+        return rent.priceOfUnit * time_passed.days
+    else:
+        return rent.priceOfUnit * (time_passed.seconds // 60)

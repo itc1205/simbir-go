@@ -1,8 +1,17 @@
 import abc
 from typing import List, Optional
+from sqlalchemy import text, TextClause
 from sqlalchemy.orm import Session
 
 from simbir_go_backend.domain.model import Rent, Transport, Account
+from enum import Enum
+
+
+class SearchTransportType(str, Enum):
+    Car = "Car"
+    Bike = "Bike"
+    Scooter = "Scooter"
+    All = "All"
 
 
 class AbstractAccountRepo(abc.ABC):
@@ -55,6 +64,15 @@ class AbstractTransportRepo(abc.ABC):
     def list(self, begin: int, limit: int) -> List[Transport]:
         return self._list(begin, limit)
 
+    def list_closest(
+        self,
+        longitude: float,
+        latitude: float,
+        radius: float,
+        transportType: SearchTransportType,
+    ) -> List[Transport]:
+        return self._list_closest(longitude, latitude, radius, transportType)
+
     @abc.abstractmethod
     def _delete(self, transport: Transport):
         raise NotImplementedError
@@ -71,6 +89,16 @@ class AbstractTransportRepo(abc.ABC):
     def _list(self, begin: int, limit: int) -> List[Transport]:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def _list_closest(
+        self,
+        longitude: float,
+        latitude: float,
+        radius: float,
+        transportType: SearchTransportType,
+    ) -> List[Transport]:
+        raise NotImplementedError
+
 
 class AbstractRentRepo(abc.ABC):
     def get(self, id: int) -> Optional[Rent]:
@@ -84,6 +112,20 @@ class AbstractRentRepo(abc.ABC):
 
     def list(self, begin: int, limit: int) -> List[Rent]:
         return self._list(begin, limit)
+
+    def get_from_transport(self, id: int) -> List[Rent]:
+        return self._get_from_transport(id)
+
+    def get_from_user(self, id: int) -> List[Rent]:
+        return self._get_from_user(id)
+
+    @abc.abstractmethod
+    def _get_from_transport(self, id: int) -> List[Rent]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _get_from_user(self, id: int) -> List[Rent]:
+        raise NotImplementedError
 
     @abc.abstractmethod
     def _delete(self, rent: Rent):
@@ -126,6 +168,27 @@ class SqlAlchemyTransportRepo(AbstractTransportRepo):
     def __init__(self, session: Session) -> None:
         self.session = session
 
+    def _list_closest(
+        self,
+        longitude: float,
+        latitude: float,
+        radius: float,
+        transportType: SearchTransportType,
+    ) -> List[Transport]:
+        result = self.session.execute(
+            self.__build_closest_transport_query(
+                longitude, latitude, radius, transportType
+            )
+        )
+
+        transports = []
+
+        for id, _distance in result:
+            transport = self.session.query(Transport).get(id)
+            transports.append(transport)
+
+        return transports
+
     def _get(self, id: int) -> Optional[Transport]:
         return self.session.query(Transport).filter_by(id=id).one_or_none()
 
@@ -138,10 +201,46 @@ class SqlAlchemyTransportRepo(AbstractTransportRepo):
     def _list(self, begin: int, limit: int) -> List[Transport]:
         return self.session.query(Transport).offset(begin).limit(limit).all()
 
+    @staticmethod
+    def __build_closest_transport_query(
+        longitude: float,
+        latitude: float,
+        radius: float,
+        transportType: SearchTransportType,
+    ) -> TextClause:
+        query = (
+            "SELECT id, "
+            "( "
+            "6371 * "
+            f"acos(cos(radians({latitude})) * "
+            "cos(radians(latitude)) * "
+            "cos(radians(longitude) - "
+            f"radians({longitude})) + "
+            f"sin(radians({latitude})) * "
+            "sin(radians(latitude))) "
+            ") AS distance "
+            "FROM transports "
+            "WHERE canBeRented=True "
+        )
+
+        if not transportType == SearchTransportType.All:
+            query += f'AND transportType="{transportType.value}" '
+        query += "GROUP BY distance "
+
+        query += f"HAVING distance < {radius} "
+        query += "ORDER BY distance; "
+        return text(query)
+
 
 class SqlAlchemyRentRepo(AbstractRentRepo):
     def __init__(self, session: Session) -> None:
         self.session = session
+
+    def _get_from_user(self, id: int) -> List[Rent]:
+        return self.session.query(Rent).filter_by(userId=id).all()
+
+    def _get_from_transport(self, id: int) -> List[Rent]:
+        return self.session.query(Rent).filter_by(transportId=id).all()
 
     def _get(self, id: int) -> Optional[Rent]:
         return self.session.query(Rent).filter_by(id=id).one_or_none()

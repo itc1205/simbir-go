@@ -20,7 +20,7 @@ services:
       - "5005:80" 
     entrypoint: 
       - uvicorn
-      - simbir_go.entrypoints.fastapi_app:app
+      - simbir_go_backend.entrypoint.fastapi_app:app
       - --host=0.0.0.0
       - --port=80
 

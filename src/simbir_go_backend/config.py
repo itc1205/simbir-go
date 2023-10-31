@@ -10,6 +10,15 @@ def get_postgres_uri():
     return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
 
 
+def get_use_in_memory_database():
+    # Change if you want to use in-memory sqlite database
+    return True
+
+
+def get_auth_endpoint_url():
+    return "/api/Account/SignIn"
+
+
 def get_api_url():
     host = os.environ.get("API_HOST", "localhost")
     port = 5005 if host == "localhost" else 80
