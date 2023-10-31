@@ -210,8 +210,8 @@ class SqlAlchemyTransportRepo(AbstractTransportRepo):
     ) -> TextClause:
         query = (
             "SELECT t.id, v.distance "
-            "FROM \"Transports\" t CROSS JOIN LATERAL "
-            f"(VALUES ( 6371 * acos( cos( radians(37) ) * cos( radians( t.latitude ) ) * cos( radians( t.longitude ) - radians({longitude}) ) + sin( radians({latitude}) ) * sin( radians( t.latitude ) ) ) "
+            'FROM "Transports" t CROSS JOIN LATERAL '
+            f"(VALUES ( 6371 * acos( cos( radians({latitude}) ) * cos( radians( t.latitude ) ) * cos( radians( t.longitude ) - radians({longitude}) ) + sin( radians({latitude}) ) * sin( radians( t.latitude ) ) ) "
             ")) v(distance) "
             f'WHERE v.distance < {radius} AND t."canBeRented"=True '
         )
