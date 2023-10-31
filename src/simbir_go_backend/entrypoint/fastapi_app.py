@@ -1,5 +1,4 @@
-from typing import Annotated
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from simbir_go_backend.adapters.sqlalchemy.orm import start_mappers
 from simbir_go_backend.entrypoint.controllers import (
     admin_controller,
@@ -9,7 +8,10 @@ from simbir_go_backend.entrypoint.controllers import (
     transport_controller,
 )
 
+from simbir_go_backend.create_admin_util import create_starter_admin
+
 start_mappers()
+create_starter_admin()
 app = FastAPI()
 
 app.include_router(router=admin_controller.router, prefix="/api")

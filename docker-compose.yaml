@@ -11,14 +11,16 @@ services:
       - DB_HOST=postgres
       - DB_PASSWORD=sOm_e_dum8_p*ssw0|^d
       - DB_USER=simbir_go
+      - DEFAULT_ADMIN=just_admin
+      - DEFAULT_PASSWORD=just_password
       - API_HOST=api
       - PYTHONDONTWRITEBYTECODE=1
-    volumes: 
+    volumes:
       - ./src:/src
       - ./tests:/tests
     ports:
-      - "5005:80" 
-    entrypoint: 
+      - "5005:80"
+    entrypoint:
       - uvicorn
       - simbir_go_backend.entrypoint.fastapi_app:app
       - --host=0.0.0.0

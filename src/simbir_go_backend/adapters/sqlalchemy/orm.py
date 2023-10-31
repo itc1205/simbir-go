@@ -20,7 +20,7 @@ mapper_registry = registry()
 metadata = mapper_registry.metadata
 
 accounts = Table(
-    "accounts",
+    "Accounts",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True, unique=True),
     Column("username", String(255), unique=True),
@@ -30,10 +30,10 @@ accounts = Table(
 )
 
 transports = Table(
-    "transports",
+    "Transports",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True, unique=True),
-    Column("ownerId", ForeignKey("accounts.id")),
+    Column("ownerId", ForeignKey("Accounts.id")),
     Column("canBeRented", Boolean),
     Column("transportType", OrmTransportType),
     Column("model", String(255)),
@@ -47,11 +47,11 @@ transports = Table(
 )
 
 rents = Table(
-    "rents",
+    "Rents",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True, unique=True),
-    Column("userId", ForeignKey("accounts.id")),
-    Column("transportId", ForeignKey("transports.id")),
+    Column("userId", ForeignKey("Accounts.id")),
+    Column("transportId", ForeignKey("Transports.id")),
     Column("timeStart", DateTime),
     Column("timeEnd", DateTime, nullable=True),
     Column("priceOfUnit", Float),

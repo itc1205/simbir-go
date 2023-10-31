@@ -19,7 +19,7 @@ def get_transport(id: int, uow=Depends(get_uow)):
         return transport_services.read_transport_by_id(id, uow)
     except TransportNotFound:
         raise EntityNotFound(detail="Transport does not exists")
-
+    
 
 @router.post("/")
 def create_transport(

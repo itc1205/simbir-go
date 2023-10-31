@@ -4,7 +4,6 @@ from simbir_go_backend.service.exceptions import AccountAlreadyExists, AccountNo
 from simbir_go_backend.service.dtos import CreateUser, UserInfo, UpdateUser
 from simbir_go_backend.adapters.security import verify_password, hash_password
 
-
 def create_new_user(data: CreateUser, uow: AbstractUnitOfWork):
     with uow:
         if uow.accounts.get_by_username(data.username) is not None:

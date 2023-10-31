@@ -1,6 +1,13 @@
 import os
 
 
+def get_admin_credentials():
+    username = os.environ.get("DEFAULT_ADMIN", "admin")
+    password = os.environ.get("DEFAULT_PASSWORD", "admin")
+    balance = 24124912
+    return (username, password, balance)
+
+
 def get_postgres_uri():
     host = os.environ.get("DB_HOST", "localhost")
     port = 54321 if host == "localhost" else 5432
@@ -11,8 +18,8 @@ def get_postgres_uri():
 
 
 def get_use_in_memory_database():
-    # Change if you want to use in-memory sqlite database
-    return True
+    # Change if you want to use sqlite database
+    return False
 
 
 def get_auth_endpoint_url():

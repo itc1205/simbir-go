@@ -22,7 +22,7 @@ router = APIRouter(prefix="/Account", tags=["AccountController"])
 @router.post("/SignUp")
 def create_account(data: schemas.CreateUser, uow=Depends(get_uow)):
     try:
-        return account_services.create_new_user(
+        account_services.create_new_user(
             dtos.CreateUser(
                 username=data.username, password=data.password, isAdmin=False, balance=0
             ),
@@ -30,6 +30,7 @@ def create_account(data: schemas.CreateUser, uow=Depends(get_uow)):
         )
     except AccountAlreadyExists:
         raise LoginAlreadyExists
+    return 200
 
 
 @router.post("/SignIn")
@@ -59,7 +60,7 @@ def update_account(
         )
     except AccountNotFound:
         raise EntityNotFound
-
+    return 200
 
 @router.get("/Me")
 def me(user=Depends(get_current_account)):

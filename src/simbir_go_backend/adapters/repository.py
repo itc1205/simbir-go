@@ -218,17 +218,17 @@ class SqlAlchemyTransportRepo(AbstractTransportRepo):
             f"radians({longitude})) + "
             f"sin(radians({latitude})) * "
             "sin(radians(latitude))) "
-            ") AS distance "
-            "FROM transports "
-            "WHERE canBeRented=True "
+            ") AS \"distance\""
+            'FROM "Transports" '
+            'WHERE "canBeRented"=True '
         )
 
         if not transportType == SearchTransportType.All:
-            query += f'AND transportType="{transportType.value}" '
-        query += "GROUP BY distance "
+            query += f'AND "transportType"=\'{transportType.value}\' '
+        #query += "GROUP BY \"distance\" "
 
-        query += f"HAVING distance < {radius} "
-        query += "ORDER BY distance; "
+        query += f"HAVING \"distance\" < {radius} "
+        query += "ORDER BY \"distance\"; "
         return text(query)
 
 
