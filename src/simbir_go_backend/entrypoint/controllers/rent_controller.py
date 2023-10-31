@@ -42,7 +42,7 @@ def get_info_rent(id: int, uow=Depends(get_uow), user=Depends(get_current_accoun
         )
     if user.id != transport.ownerId and user.id != rent.userId:
         raise NotEnoughPrivileges
-    return 200
+    return rent
 
 
 @router.get("/MyHistory")

@@ -6,6 +6,7 @@ from simbir_go_backend.domain.model import TransportType, PriceType
 from simbir_go_backend.adapters.repository import SearchTransportType
 
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
